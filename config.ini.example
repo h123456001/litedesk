@@ -1,0 +1,31 @@
+# LiteDesk Configuration File (Example)
+# Copy this file and modify as needed
+
+[server]
+# Server host address (0.0.0.0 to listen on all interfaces)
+host = 0.0.0.0
+
+# Server port
+port = 9876
+
+# JPEG quality (1-100, lower = smaller file size)
+quality = 50
+
+# Frame rate control (seconds between frames, lower = higher FPS)
+# 0.1 = ~10 FPS, 0.05 = ~20 FPS
+frame_delay = 0.1
+
+[client]
+# Default server IP (can be overridden in UI)
+default_server = 127.0.0.1
+
+# Default port
+port = 9876
+
+[display]
+# Client window default size
+window_width = 900
+window_height = 700
+
+# Enable smooth scaling
+smooth_scaling = true
