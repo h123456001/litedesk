@@ -80,7 +80,7 @@ class LiteDeskServer(QMainWindow):
         self.start_button.clicked.connect(self.toggle_sharing)
         layout.addWidget(self.start_button)
         
-        layout.addStretch()
+        layout.addStretch(1)
     
     def toggle_sharing(self):
         """Start or stop sharing"""

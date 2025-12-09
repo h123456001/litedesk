@@ -29,7 +29,6 @@ class RemoteDesktopWidget(QLabel):
         super().__init__()
         self.setMinimumSize(800, 600)
         self.setAlignment(Qt.AlignCenter)
-        self.setStyleSheet("background-color: black; border: 1px solid gray;")
         self.setText("Not connected")
         self.setStyleSheet("background-color: black; color: white; border: 1px solid gray;")
         
@@ -59,7 +58,10 @@ class RemoteDesktopWidget(QLabel):
         self.setPixmap(pixmap)
         
         # Calculate scale factor for mouse coordinates
-        self.scale_factor = pil_image.width / scaled.width()
+        if scaled.width() > 0:
+            self.scale_factor = pil_image.width / scaled.width()
+        else:
+            self.scale_factor = 1.0
     
     def mouseMoveEvent(self, event):
         """Handle mouse movement"""

@@ -95,7 +95,8 @@ class NetworkServer:
             
             # Parse JSON command
             return json.loads(cmd_data.decode('utf-8'))
-        except:
+        except (socket.error, json.JSONDecodeError, UnicodeDecodeError) as e:
+            print(f"Error receiving command: {e}")
             return None
     
     def _recv_exact(self, size):
@@ -196,7 +197,8 @@ class NetworkClient:
             length = struct.pack('!I', len(cmd_json))
             self.socket.sendall(length + cmd_json)
             return True
-        except:
+        except (socket.error, json.JSONEncodeError, UnicodeEncodeError) as e:
+            print(f"Error sending command: {e}")
             self.connected = False
             return False
     
