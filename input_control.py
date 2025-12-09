@@ -48,14 +48,14 @@ class InputController:
             # Try as a regular character
             self.keyboard.press(key)
             self.keyboard.release(key)
-        except (ValueError, AttributeError):
+        except (ValueError, AttributeError) as e:
             # Try as a special key
             try:
                 special_key = getattr(Key, key.lower())
                 self.keyboard.press(special_key)
                 self.keyboard.release(special_key)
-            except (AttributeError, ValueError):
-                print(f"Warning: Could not press key '{key}'")
+            except (AttributeError, ValueError) as e2:
+                print(f"Warning: Could not press key '{key}': {e2}")
     
     def type_text(self, text):
         """Type a string of text"""

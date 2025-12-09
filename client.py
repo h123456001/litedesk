@@ -57,8 +57,8 @@ class RemoteDesktopWidget(QLabel):
         pixmap = QPixmap.fromImage(scaled)
         self.setPixmap(pixmap)
         
-        # Calculate scale factor for mouse coordinates
-        if scaled.width() > 0:
+        # Calculate scale factor for mouse coordinates (prevent division by zero)
+        if scaled.width() > 0 and scaled.height() > 0:
             self.scale_factor = pil_image.width / scaled.width()
         else:
             self.scale_factor = 1.0
