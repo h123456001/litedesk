@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from PyQt5.QtGui import QFont
 from screen_capture import ScreenCapture
 from input_control import InputController
-from network import NetworkServer
+from network import NetworkServer, NetworkServerWithRelay
 
 
 class ServerSignals(QObject):
@@ -44,13 +44,13 @@ class LiteDeskServer(QMainWindow):
     def init_ui(self):
         """Initialize the user interface"""
         self.setWindowTitle("LiteDesk Server - Share Desktop")
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 450, 400)
         
         # Central widget
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         layout = QVBoxLayout(central_widget)
-        layout.setSpacing(20)
+        layout.setSpacing(15)
         layout.setContentsMargins(30, 30, 30, 30)
         
         # Title
@@ -58,6 +58,26 @@ class LiteDeskServer(QMainWindow):
         title.setFont(QFont("Arial", 20, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
+        
+        # Relay server input (optional)
+        from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QCheckBox
+        
+        relay_layout = QHBoxLayout()
+        self.use_relay_checkbox = QCheckBox("Use Relay Server:")
+        self.use_relay_checkbox.setFont(QFont("Arial", 10))
+        relay_layout.addWidget(self.use_relay_checkbox)
+        
+        self.relay_input = QLineEdit()
+        self.relay_input.setPlaceholderText("Relay server IP (optional, for NAT)")
+        self.relay_input.setFont(QFont("Arial", 10))
+        self.relay_input.setEnabled(False)
+        relay_layout.addWidget(self.relay_input)
+        
+        self.use_relay_checkbox.stateChanged.connect(
+            lambda state: self.relay_input.setEnabled(state == Qt.Checked)
+        )
+        
+        layout.addLayout(relay_layout)
         
         # Status label
         self.status_label = QLabel("Not sharing")
@@ -92,20 +112,43 @@ class LiteDeskServer(QMainWindow):
     def start_sharing(self):
         """Start the server and screen sharing"""
         try:
+            # Check if relay mode is enabled
+            use_relay = self.use_relay_checkbox.isChecked()
+            relay_host = self.relay_input.text().strip() if use_relay else None
+            
             # Initialize components
-            self.server = NetworkServer(host='0.0.0.0', port=9876)
+            if use_relay and relay_host:
+                import socket
+                peer_id = f"server_{socket.gethostname()}"
+                self.server = NetworkServerWithRelay(
+                    host='0.0.0.0', 
+                    port=9876,
+                    relay_host=relay_host,
+                    relay_port=8877,
+                    peer_id=peer_id
+                )
+                self.server.start_with_relay()
+                info_text = f"Server is listening on port 9876\n"
+                info_text += f"Registered with relay: {relay_host}\n"
+                info_text += f"Server ID: {peer_id}\n"
+                info_text += "Clients can connect via relay or direct IP"
+            else:
+                self.server = NetworkServer(host='0.0.0.0', port=9876)
+                self.server.start()
+                info_text = "Server is listening on port 9876\nShare your IP address with the client"
+            
             self.screen_capture = ScreenCapture(quality=50)
             self.input_controller = InputController()
             
-            # Start server
-            self.server.start()
             self.running = True
             
             # Update UI
             self.status_label.setText("⏳ Waiting for connection...")
             self.status_label.setStyleSheet("color: orange; padding: 10px;")
-            self.info_label.setText("Server is listening on port 9876\nShare your IP address with the client")
+            self.info_label.setText(info_text)
             self.start_button.setText("Stop Sharing")
+            self.use_relay_checkbox.setEnabled(False)
+            self.relay_input.setEnabled(False)
             
             # Start server thread
             threading.Thread(target=self.server_loop, daemon=True).start()
@@ -180,6 +223,9 @@ class LiteDeskServer(QMainWindow):
         self.status_label.setStyleSheet("color: gray; padding: 10px;")
         self.info_label.setText("")
         self.start_button.setText("Start Sharing")
+        self.use_relay_checkbox.setEnabled(True)
+        if self.use_relay_checkbox.isChecked():
+            self.relay_input.setEnabled(True)
     
     def on_client_connected(self, msg):
         """Handle client connection"""
