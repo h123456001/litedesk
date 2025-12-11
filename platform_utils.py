@@ -215,15 +215,16 @@ def check_dependencies():
     
     # Check PIL/Pillow
     try:
-        from PIL import Image
-        results['Pillow'] = {'available': True, 'version': Image.__version__}
+        import PIL
+        results['Pillow'] = {'available': True, 'version': PIL.__version__}
     except ImportError as e:
         results['Pillow'] = {'available': False, 'error': str(e)}
     
     # Check pynput
     try:
         import pynput
-        results['pynput'] = {'available': True, 'version': pynput.__version__}
+        version = getattr(pynput, '__version__', 'unknown')
+        results['pynput'] = {'available': True, 'version': version}
     except ImportError as e:
         results['pynput'] = {'available': False, 'error': str(e)}
     

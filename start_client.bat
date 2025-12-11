@@ -30,19 +30,48 @@ echo.
 REM Check if dependencies are installed
 echo Checking dependencies...
 
-python -c "import mss, PIL, pynput, PyQt5" >nul 2>&1
+python -c "import mss" >nul 2>&1
 if errorlevel 1 (
-    echo Some dependencies are missing
-    echo Installing dependencies...
-    pip install -r requirements.txt
-    
-    if errorlevel 1 (
-        echo Failed to install dependencies
-        echo.
-        pause
-        exit /b 1
-    )
+    echo Missing dependency: mss
+    goto install_deps
+)
+
+python -c "import PIL" >nul 2>&1
+if errorlevel 1 (
+    echo Missing dependency: PIL/Pillow
+    goto install_deps
+)
+
+python -c "import pynput" >nul 2>&1
+if errorlevel 1 (
+    echo Missing dependency: pynput
+    goto install_deps
+)
+
+python -c "import PyQt5" >nul 2>&1
+if errorlevel 1 (
+    echo Missing dependency: PyQt5
+    goto install_deps
+)
+
+echo All dependencies are installed
+echo.
+goto continue
+
+:install_deps
+echo Some dependencies are missing
+echo Installing dependencies...
+pip install -r requirements.txt
+
+if errorlevel 1 (
+    echo Failed to install dependencies
     echo.
+    pause
+    exit /b 1
+)
+echo.
+
+:continue
 ) else (
     echo All dependencies are installed
     echo.

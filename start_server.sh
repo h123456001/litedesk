@@ -39,11 +39,33 @@ echo -e "${GREEN}Python version: $PYTHON_VERSION${NC}"
 echo ""
 echo "Checking dependencies..."
 
-if python3 -c "import mss, PIL, pynput, PyQt5" 2>/dev/null; then
+DEPS_OK=true
+
+if ! python3 -c "import mss" 2>/dev/null; then
+    echo -e "${YELLOW}⚠ Missing: mss${NC}"
+    DEPS_OK=false
+fi
+
+if ! python3 -c "import PIL" 2>/dev/null; then
+    echo -e "${YELLOW}⚠ Missing: PIL/Pillow${NC}"
+    DEPS_OK=false
+fi
+
+if ! python3 -c "import pynput" 2>/dev/null; then
+    echo -e "${YELLOW}⚠ Missing: pynput${NC}"
+    DEPS_OK=false
+fi
+
+if ! python3 -c "import PyQt5" 2>/dev/null; then
+    echo -e "${YELLOW}⚠ Missing: PyQt5${NC}"
+    DEPS_OK=false
+fi
+
+if [ "$DEPS_OK" = true ]; then
     echo -e "${GREEN}✓ All dependencies are installed${NC}"
 else
-    echo -e "${YELLOW}⚠ Some dependencies are missing${NC}"
-    echo "Installing dependencies..."
+    echo ""
+    echo "Installing missing dependencies..."
     pip3 install -r requirements.txt
     
     if [ $? -ne 0 ]; then
