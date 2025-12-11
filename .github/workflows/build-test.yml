@@ -1,0 +1,42 @@
+name: Build Test
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  test-build-relay:
+    name: Test Build Relay Server
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install pyinstaller
+      
+      - name: Build relay server
+        run: |
+          pyinstaller --clean --noconfirm litedesk_relay.spec
+      
+      - name: Test relay executable
+        run: |
+          ./dist/litedesk-relay --help
+      
+      - name: Upload artifact for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-litedesk-relay-linux
+          path: dist/litedesk-relay
+          retention-days: 7

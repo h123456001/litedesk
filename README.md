@@ -479,6 +479,47 @@ Command Format:
 
 欢迎提交 Issue 和 Pull Request！
 
+### 为开发者
+
+如果你想参与 LiteDesk 的开发或构建自己的版本：
+
+#### 从源码运行
+```bash
+git clone https://github.com/h123456001/litedesk.git
+cd litedesk
+pip install -r requirements.txt
+python3 server.py  # 或 client.py, relay_server.py
+```
+
+#### 构建可执行文件
+```bash
+# 安装 PyInstaller
+pip install pyinstaller
+
+# 构建所有组件（服务端、客户端、中继服务器）
+python build_all.py
+
+# 输出将在 release/ 目录中
+```
+
+#### 创建发布版本
+```bash
+# 使用发布助手脚本
+python release.py create
+
+# 这将：
+# 1. 更新版本号
+# 2. 创建 git tag
+# 3. 推送到 GitHub
+# 4. 触发自动构建和发布
+```
+
+#### 相关文档
+- 📦 [BUILD.md](BUILD.md) - 详细的构建说明
+- 🚀 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) - 发布流程清单
+- 🌐 [VPS_DEPLOY.md](VPS_DEPLOY.md) - VPS 部署指南
+- 🔧 [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
+
 ## 📄 许可证
 
 MIT License
