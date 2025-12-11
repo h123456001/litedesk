@@ -2,10 +2,13 @@
 
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
+![Cross-Platform](https://img.shields.io/badge/cross--platform-ready-success.svg)
 
 基于 RustDesk 架构思想实现的简易版点对点(P2P)远程桌面控制软件。支持屏幕共享和远程控制功能。
 
 **🆕 新增 NAT 穿透支持**：通过中继服务器实现无公网 IP 的远程连接！
+**✨ 完整跨平台支持**：Mac、Windows、Linux 全平台图形化界面！
 
 ## ✨ 功能特性
 
@@ -16,18 +19,55 @@
 - 🎨 **图形界面**: 基于 PyQt5 的友好用户界面
 - ⚡ **高效传输**: JPEG 压缩优化网络传输
 - 🔒 **轻量级**: 纯 Python 实现，易于部署
+- 🌍 **跨平台**: 完整支持 macOS、Windows、Linux
+
+## 🖥️ 平台支持
+
+| 平台 | 被控端 (Server) | 控制端 (Client) | 状态 |
+|------|----------------|----------------|------|
+| **macOS** | ✅ 完全支持 | ✅ 完全支持 | 10.12+ |
+| **Windows** | ✅ 完全支持 | ✅ 完全支持 | 10/11 |
+| **Linux** | ✅ 完全支持 | ✅ 完全支持 | X11 |
 
 ## 📋 系统要求
 
 - Python 3.7 或更高版本
 - 支持的操作系统：
-  - Windows 10/11
-  - macOS 10.12+
-  - Linux (X11)
+  - **macOS**: 10.12 (Sierra) 或更高
+  - **Windows**: Windows 10/11
+  - **Linux**: 需要 X11 显示服务器
 
 ## 🚀 快速开始
 
+### 快速安装 (推荐)
+
+**macOS / Linux:**
+```bash
+git clone https://github.com/h123456001/litedesk.git
+cd litedesk
+./start_server.sh  # 启动被控端
+# 或
+./start_client.sh  # 启动控制端
+```
+
+**Windows:**
+```cmd
+git clone https://github.com/h123456001/litedesk.git
+cd litedesk
+start_server.bat  # 启动被控端
+REM 或
+start_client.bat  # 启动控制端
+```
+
+启动脚本会自动：
+- 检查 Python 安装
+- 安装所需依赖
+- 显示平台特定说明
+- 启动应用程序
+
 ### 1. 安装依赖
+
+如需手动安装：
 
 ```bash
 # 克隆仓库
@@ -36,16 +76,32 @@ cd litedesk
 
 # 安装 Python 依赖
 pip install -r requirements.txt
+# Windows 使用: pip install -r requirements.txt
+# macOS/Linux 使用: pip3 install -r requirements.txt
 ```
 
 ### 2. 启动服务端（被控制端）
 
 在需要被远程控制的电脑上运行：
 
+**使用启动脚本 (推荐):**
 ```bash
-python server.py
+./start_server.sh    # macOS/Linux
+start_server.bat     # Windows
 ```
 
+**或直接运行:**
+```bash
+python3 server.py    # macOS/Linux
+python server.py     # Windows
+```
+
+**平台特定注意事项:**
+- **macOS**: 首次运行需要授予屏幕录制和辅助功能权限
+- **Windows**: 可能需要允许防火墙访问，建议以管理员身份运行
+- **Linux**: 需要 X11 显示服务器，确保 DISPLAY 环境变量已设置
+
+操作步骤：
 1. 点击 "Start Sharing" 按钮开始共享桌面
 2. 查看本机 IP 地址并告知客户端
 3. 等待客户端连接
@@ -54,8 +110,16 @@ python server.py
 
 在控制其他电脑的设备上运行：
 
+**使用启动脚本 (推荐):**
 ```bash
-python client.py
+./start_client.sh    # macOS/Linux
+start_client.bat     # Windows
+```
+
+**或直接运行:**
+```bash
+python3 client.py    # macOS/Linux
+python client.py     # Windows
 ```
 
 #### 直接连接模式（局域网）
@@ -249,6 +313,41 @@ time.sleep(0.1)  # 约 10 FPS
 - **pynput**: 跨平台输入控制
 - **socket**: TCP 网络通信
 
+## 🧪 测试
+
+LiteDesk 提供了完整的测试套件来验证各平台的兼容性：
+
+### 基础组件测试
+```bash
+python3 test_litedesk.py    # macOS/Linux
+python test_litedesk.py     # Windows
+```
+
+### 综合测试 (推荐)
+```bash
+python3 test_comprehensive.py    # macOS/Linux
+python test_comprehensive.py     # Windows
+```
+
+综合测试包括：
+- ✓ 平台检测和信息获取
+- ✓ 依赖项可用性检查
+- ✓ 网络协议编码/解码
+- ✓ Socket 通信测试
+- ✓ 图像压缩/解压测试
+
+### 平台信息工具
+```bash
+python3 platform_utils.py    # macOS/Linux
+python platform_utils.py     # Windows
+```
+
+显示：
+- 当前平台信息
+- 权限要求
+- 网络配置
+- 依赖状态
+
 ## 📝 网络协议
 
 ### 帧传输协议
@@ -284,9 +383,15 @@ Command Format:
 1. **防火墙配置**: 确保服务端的 9876 端口未被防火墙阻止
 2. **网络连接**: 客户端和服务端需要在同一网络或能够互相访问
 3. **权限要求**: 
-   - macOS 需要授予屏幕录制和辅助功能权限
-   - Linux 需要 X11 显示服务器支持
+   - **macOS**: 需要授予屏幕录制和辅助功能权限 (系统偏好设置 > 安全性与隐私 > 隐私)
+   - **Windows**: 需要允许防火墙访问，建议以管理员身份运行
+   - **Linux**: 需要 X11 显示服务器支持，确保 DISPLAY 环境变量已设置
 4. **安全警告**: 此为演示项目，未实现加密和身份验证，不建议在公网使用
+
+详细的平台特定说明请参考：
+- 📖 [安装指南 (INSTALL.md)](INSTALL.md) - 详细的各平台安装步骤
+- 🖥️ [跨平台指南 (PLATFORM.md)](PLATFORM.md) - 平台兼容性和特性说明
+- 🔧 [故障排除 (TROUBLESHOOTING.md)](TROUBLESHOOTING.md) - 常见问题解决方案
 
 ## 🔒 安全建议
 
