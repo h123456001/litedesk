@@ -38,7 +38,7 @@ jobs:
           ./dist/litedesk-relay --help
       
       - name: Upload artifact for inspection
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: test-litedesk-relay-linux
           path: dist/litedesk-relay
