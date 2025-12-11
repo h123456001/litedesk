@@ -1,0 +1,182 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Trigger on version tags like v1.0.0
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build executables
+        run: |
+          python build_all.py
+      
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: litedesk-windows-x64
+          path: release/windows-x64.zip
+          retention-days: 30
+
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+          pip3 install pyinstaller
+      
+      - name: Build executables
+        run: |
+          python3 build_all.py
+      
+      - name: Upload macOS x64 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: litedesk-macos-x64
+          path: release/macos-*.zip
+          retention-days: 30
+
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            python3-pyqt5 \
+            python3-pyqt5.qtsvg \
+            libxcb-xinerama0 \
+            libxcb-cursor0 \
+            libxkbcommon-x11-0 \
+            libxcb-icccm4 \
+            libxcb-image0 \
+            libxcb-keysyms1 \
+            libxcb-randr0 \
+            libxcb-render-util0 \
+            libxcb-shape0
+      
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+          pip3 install pyinstaller
+      
+      - name: Build executables
+        run: |
+          python3 build_all.py
+      
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: litedesk-linux-x64
+          path: release/linux-*.zip
+          retention-days: 30
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/litedesk-windows-x64/*.zip
+            artifacts/litedesk-macos-x64/*.zip
+            artifacts/litedesk-linux-x64/*.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## LiteDesk Release ${{ github.ref_name }}
+            
+            ### 📦 Downloads
+            
+            Choose the appropriate package for your platform:
+            
+            - **Windows**: `litedesk-windows-x64.zip`
+            - **macOS**: `litedesk-macos-x64.zip` or `litedesk-macos-arm64.zip`
+            - **Linux**: `litedesk-linux-x64.zip`
+            
+            ### 📋 What's Included
+            
+            Each package contains:
+            - `litedesk-server` - Server executable (被控端)
+            - `litedesk-client` - Client executable (控制端)
+            - `litedesk-relay` - Relay server executable (中继服务器)
+            - Documentation files (README, LICENSE, etc.)
+            - `vps.ini.example` - Configuration example for relay server
+            
+            ### 🚀 Quick Start
+            
+            1. Download the package for your platform
+            2. Extract the archive
+            3. Run `litedesk-server` on the machine you want to control
+            4. Run `litedesk-client` on the machine you want to control from
+            5. (Optional) Deploy `litedesk-relay` on a VPS for NAT traversal
+            
+            ### 📖 Documentation
+            
+            For detailed instructions, see:
+            - [README.md](https://github.com/h123456001/litedesk/blob/main/README.md)
+            - [RELAY_GUIDE.md](https://github.com/h123456001/litedesk/blob/main/RELAY_GUIDE.md)
+            
+            ---
+            
+            **Full Changelog**: https://github.com/h123456001/litedesk/compare/v1.0.0...${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

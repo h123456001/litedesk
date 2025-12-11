@@ -20,6 +20,19 @@ wheels/
 .installed.cfg
 *.egg
 
+# PyInstaller
+*.spec.bak
+*.manifest
+
+# Build artifacts
+release/
+*.zip
+*.tar.gz
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
 # Virtual Environment
 venv/
 ENV/

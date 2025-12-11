@@ -1,0 +1,40 @@
+# LiteDesk Relay Server Configuration
+# 用于配置中继服务器的连接信息
+
+[relay]
+# Relay server address (中继服务器地址)
+# This should be your VPS public IP or domain name
+# 这应该是你的VPS公网IP或域名
+host = your.vps.domain.com
+
+# Relay server port (中继服务器端口)
+# Default port is 8877
+# 默认端口是8877
+port = 8877
+
+# Enable relay mode (启用中继模式)
+# Set to true to use relay server for NAT traversal
+# 设置为true以使用中继服务器进行NAT穿透
+enabled = true
+
+[connection]
+# Connection timeout in seconds (连接超时时间，秒)
+timeout = 30
+
+# Reconnect attempts (重连尝试次数)
+max_retries = 3
+
+# Retry delay in seconds (重试延迟，秒)
+retry_delay = 5
+
+[advanced]
+# Keep-alive interval in seconds (保活间隔，秒)
+keepalive_interval = 30
+
+# Buffer size for network operations (网络操作缓冲区大小)
+buffer_size = 65536
+
+# Enable compression (启用压缩)
+# This can reduce bandwidth usage but increases CPU load
+# 这可以减少带宽使用但会增加CPU负载
+compression = false

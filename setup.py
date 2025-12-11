@@ -39,6 +39,7 @@ setup(
         "console_scripts": [
             "litedesk-server=server:main",
             "litedesk-client=client:main",
+            "litedesk-relay=relay_server:main",
         ],
     },
 )
