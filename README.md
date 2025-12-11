@@ -4,11 +4,13 @@
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
 ![Cross-Platform](https://img.shields.io/badge/cross--platform-ready-success.svg)
+![Release](https://img.shields.io/github/v/release/h123456001/litedesk)
 
 基于 RustDesk 架构思想实现的简易版点对点(P2P)远程桌面控制软件。支持屏幕共享和远程控制功能。
 
 **🆕 新增 NAT 穿透支持**：通过中继服务器实现无公网 IP 的远程连接！
 **✨ 完整跨平台支持**：Mac、Windows、Linux 全平台图形化界面！
+**📦 开箱即用**：无需 Python 环境，直接从 GitHub Releases 下载可执行文件！
 
 ## ✨ 功能特性
 
@@ -20,6 +22,7 @@
 - ⚡ **高效传输**: JPEG 压缩优化网络传输
 - 🔒 **轻量级**: 纯 Python 实现，易于部署
 - 🌍 **跨平台**: 完整支持 macOS、Windows、Linux
+- 📦 **独立执行**: 提供打包好的可执行文件，无需安装 Python
 
 ## 🖥️ 平台支持
 
@@ -31,6 +34,14 @@
 
 ## 📋 系统要求
 
+### 使用可执行文件（推荐）
+- 无需安装 Python 或其他依赖
+- 支持的操作系统：
+  - **macOS**: 10.12 (Sierra) 或更高
+  - **Windows**: Windows 10/11
+  - **Linux**: 需要 X11 显示服务器
+
+### 从源码运行
 - Python 3.7 或更高版本
 - 支持的操作系统：
   - **macOS**: 10.12 (Sierra) 或更高
@@ -39,7 +50,68 @@
 
 ## 🚀 快速开始
 
-### 快速安装 (推荐)
+### 方法一：下载可执行文件（推荐，无需 Python）
+
+1. **前往 [GitHub Releases](https://github.com/h123456001/litedesk/releases) 页面**
+
+2. **下载对应平台的压缩包：**
+   - Windows: `litedesk-windows-x64.zip`
+   - macOS (Intel): `litedesk-macos-x64.zip`
+   - macOS (Apple Silicon): `litedesk-macos-arm64.zip`
+   - Linux: `litedesk-linux-x64.zip`
+
+3. **解压缩并运行：**
+
+   **Windows:**
+   ```cmd
+   # 解压后，双击运行：
+   litedesk-server.exe  # 被控端
+   litedesk-client.exe  # 控制端
+   litedesk-relay.exe   # 中继服务器（可选）
+   ```
+
+   **macOS:**
+   ```bash
+   # 解压后
+   ./litedesk-server  # 被控端
+   ./litedesk-client  # 控制端
+   ./litedesk-relay   # 中继服务器（可选）
+   
+   # 首次运行可能需要允许运行：
+   # 右键 -> 打开 -> 确认打开
+   ```
+
+   **Linux:**
+   ```bash
+   # 解压后
+   chmod +x litedesk-*
+   ./litedesk-server  # 被控端
+   ./litedesk-client  # 控制端
+   ./litedesk-relay   # 中继服务器（可选）
+   ```
+
+4. **VPS 中继服务器部署（可选）：**
+   
+   如需 NAT 穿透支持，可在有公网 IP 的 VPS 上部署中继服务器：
+   
+   ```bash
+   # 下载并解压对应平台的 Release 包
+   wget https://github.com/h123456001/litedesk/releases/latest/download/litedesk-linux-x64.zip
+   unzip litedesk-linux-x64.zip
+   cd litedesk-linux-x64
+   
+   # 运行中继服务器
+   ./litedesk-relay --port 8877
+   
+   # 或使用配置文件
+   cp vps.ini.example vps.ini
+   # 编辑 vps.ini 配置中继服务器参数
+   ./litedesk-relay
+   ```
+
+### 方法二：从源码运行（需要 Python）
+
+#### 快速安装 (推荐)
 
 **macOS / Linux:**
 ```bash
@@ -406,6 +478,47 @@ Command Format:
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request！
+
+### 为开发者
+
+如果你想参与 LiteDesk 的开发或构建自己的版本：
+
+#### 从源码运行
+```bash
+git clone https://github.com/h123456001/litedesk.git
+cd litedesk
+pip install -r requirements.txt
+python3 server.py  # 或 client.py, relay_server.py
+```
+
+#### 构建可执行文件
+```bash
+# 安装 PyInstaller
+pip install pyinstaller
+
+# 构建所有组件（服务端、客户端、中继服务器）
+python build_all.py
+
+# 输出将在 release/ 目录中
+```
+
+#### 创建发布版本
+```bash
+# 使用发布助手脚本
+python release.py create
+
+# 这将：
+# 1. 更新版本号
+# 2. 创建 git tag
+# 3. 推送到 GitHub
+# 4. 触发自动构建和发布
+```
+
+#### 相关文档
+- 📦 [BUILD.md](BUILD.md) - 详细的构建说明
+- 🚀 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) - 发布流程清单
+- 🌐 [VPS_DEPLOY.md](VPS_DEPLOY.md) - VPS 部署指南
+- 🔧 [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
 
 ## 📄 许可证
 
