@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from PyQt5.QtGui import QFont, QPixmap, QImage, QPainter
 from network import NetworkClient, NetworkClientWithRelay
+from platform_utils import get_platform, show_permission_instructions
 
 
 class ClientSignals(QObject):
@@ -116,7 +117,8 @@ class LiteDeskClient(QMainWindow):
     
     def init_ui(self):
         """Initialize the user interface"""
-        self.setWindowTitle("LiteDesk Client - Remote Desktop")
+        platform_name = get_platform().upper()
+        self.setWindowTitle(f"LiteDesk Client - Remote Desktop ({platform_name})")
         self.setGeometry(100, 100, 900, 750)
         
         # Central widget

@@ -14,6 +14,8 @@ from PyQt5.QtGui import QFont
 from screen_capture import ScreenCapture
 from input_control import InputController
 from network import NetworkServer, NetworkServerWithRelay
+from platform_utils import (get_platform, get_default_network_interface, 
+                            show_permission_instructions, check_display_available)
 
 
 class ServerSignals(QObject):
@@ -43,8 +45,9 @@ class LiteDeskServer(QMainWindow):
     
     def init_ui(self):
         """Initialize the user interface"""
-        self.setWindowTitle("LiteDesk Server - Share Desktop")
-        self.setGeometry(100, 100, 450, 400)
+        platform_name = get_platform().upper()
+        self.setWindowTitle(f"LiteDesk Server - Share Desktop ({platform_name})")
+        self.setGeometry(100, 100, 450, 450)
         
         # Central widget
         central_widget = QWidget()
@@ -79,6 +82,15 @@ class LiteDeskServer(QMainWindow):
         
         layout.addLayout(relay_layout)
         
+        # Platform info label
+        platform_name = get_platform().capitalize()
+        local_ip = get_default_network_interface() or "N/A"
+        self.platform_label = QLabel(f"Platform: {platform_name} | Local IP: {local_ip}")
+        self.platform_label.setFont(QFont("Arial", 9))
+        self.platform_label.setAlignment(Qt.AlignCenter)
+        self.platform_label.setStyleSheet("color: #666; padding: 5px;")
+        layout.addWidget(self.platform_label)
+        
         # Status label
         self.status_label = QLabel("Not sharing")
         self.status_label.setFont(QFont("Arial", 12))
@@ -112,6 +124,13 @@ class LiteDeskServer(QMainWindow):
     def start_sharing(self):
         """Start the server and screen sharing"""
         try:
+            # Check display availability
+            if not check_display_available():
+                msg = "Display not available. "
+                msg += show_permission_instructions()
+                QMessageBox.warning(self, "Display Not Available", msg)
+                # Continue anyway as this might work in some cases
+            
             # Check if relay mode is enabled
             use_relay = self.use_relay_checkbox.isChecked()
             relay_host = self.relay_input.text().strip() if use_relay else None
