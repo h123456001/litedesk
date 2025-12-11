@@ -96,14 +96,15 @@ def organize_output(platform_name, arch):
         else:
             print(f"⚠ {exe_name} not found in dist directory")
     
-    # Copy documentation
-    docs = ['README.md', 'LICENSE', 'RELAY_GUIDE.md']
-    for doc in docs:
-        doc_path = Path(doc)
-        if doc_path.exists():
-            shutil.copy2(doc_path, output_dir / doc)
+    # Copy documentation files - auto-discover markdown files in root
+    root_dir = Path('.')
+    doc_patterns = ['*.md', 'LICENSE']
+    for pattern in doc_patterns:
+        for doc_path in root_dir.glob(pattern):
+            if doc_path.is_file() and not doc_path.name.startswith('.'):
+                shutil.copy2(doc_path, output_dir / doc_path.name)
     
-    # Create vps.ini.example in output
+    # Copy vps.ini.example if exists
     vps_example = Path('vps.ini.example')
     if vps_example.exists():
         shutil.copy2(vps_example, output_dir / 'vps.ini.example')

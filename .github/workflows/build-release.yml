@@ -64,8 +64,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: litedesk-macos-x64
-          path: release/macos-*.zip
+          path: release/macos-x64.zip
           retention-days: 30
+          if-no-files-found: warn
 
   build-linux:
     name: Build Linux
@@ -110,8 +111,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: litedesk-linux-x64
-          path: release/linux-*.zip
+          path: release/linux-x64.zip
           retention-days: 30
+          if-no-files-found: warn
 
   create-release:
     name: Create GitHub Release
@@ -174,9 +176,5 @@ jobs:
             For detailed instructions, see:
             - [README.md](https://github.com/h123456001/litedesk/blob/main/README.md)
             - [RELAY_GUIDE.md](https://github.com/h123456001/litedesk/blob/main/RELAY_GUIDE.md)
-            
-            ---
-            
-            **Full Changelog**: https://github.com/h123456001/litedesk/compare/v1.0.0...${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -67,6 +67,20 @@ def get_git_branch():
     return run_command('git rev-parse --abbrev-ref HEAD', capture_output=True)
 
 
+def get_git_remote_url():
+    """Get GitHub repository URL from git remote"""
+    try:
+        remote_url = run_command('git remote get-url origin', capture_output=True)
+        # Convert SSH to HTTPS if needed
+        if remote_url.startswith('git@github.com:'):
+            remote_url = remote_url.replace('git@github.com:', 'https://github.com/')
+        if remote_url.endswith('.git'):
+            remote_url = remote_url[:-4]
+        return remote_url
+    except:
+        return 'https://github.com/h123456001/litedesk'  # Fallback
+
+
 def create_release():
     """Interactive release creation"""
     print("=" * 60)
@@ -148,9 +162,10 @@ def create_release():
         print("\n" + "="*60)
         print("✓ Release process initiated!")
         print("="*60)
+        repo_url = get_git_remote_url()
         print("\nNext steps:")
-        print("1. Monitor GitHub Actions: https://github.com/h123456001/litedesk/actions")
-        print("2. Once complete, edit release notes: https://github.com/h123456001/litedesk/releases")
+        print(f"1. Monitor GitHub Actions: {repo_url}/actions")
+        print(f"2. Once complete, edit release notes: {repo_url}/releases")
         print("3. Test the released executables")
         print("4. Announce the release")
     else:
